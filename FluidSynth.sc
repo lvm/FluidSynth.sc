@@ -73,7 +73,7 @@ FluidSynth {
     "FluidSynth is running!".postln;
   }
 
-  send {|message|
+  pr_send {|message|
     fluidsynth_pipe.write("%\n".format(message));
     fluidsynth_pipe.flush;
   }
@@ -89,51 +89,47 @@ FluidSynth {
     fluidsynth = nil;
   }
 
-}
-
-FluidCommands {
-
-  *setGain {
+  setGain {
     |gain|
 
-    ^format("\ngain %", gain.asFloat.clip(0.01, 4.99));
+		pr_send(format("\ngain %", gain.asFloat.clip(0.01, 4.99)));
   }
 
-  *listChannels {
-    ^"\nchannels";
+  listChannels {
+		pr_send("\nchannels");
   }
 
-  *listSoundfonts {
-    ^"\nfonts";
+  listSoundfonts {
+		pr_send("\nfonts");
   }
 
-  *listInstruments {
+  listInstruments {
     |soundfont|
 
-    ^format("\ninst %", soundfont);
+		pr_send(format("\ninst %", soundfont));
   }
 
-  *loadSoundfont {
-    |soundfont|
-
-    if (soundfont.isNil) {
-      Error("TO_DO").throw;
-    };
-
-    ^format("\nload %", soundfont);
-  }
-
-  *unloadSoundfont {
+  loadSoundfont {
     |soundfont|
 
     if (soundfont.isNil) {
       Error("TO_DO").throw;
     };
 
-    ^format("\nunload %", soundfont);
+		pr_send(format("\nload %", soundfont));
   }
 
-  *selectInstruments {
+  unloadSoundfont {
+    |soundfont|
+
+    if (soundfont.isNil) {
+      Error("TO_DO").throw;
+    };
+
+		pr_send(format("\nunload %", soundfont));
+  }
+
+  selectInstruments {
     |instruments|
     var select_cmd = "";
     var values;
@@ -148,10 +144,13 @@ FluidCommands {
       };
     }
 
-    ^select_cmd;
-  }
+		pr_send(select_cmd);
+	}
 
-  *save {
+	// Not sure this is the right way to do this. This is now a fluid interface
+	// so trivial to write readable code that does all the setup as part of a
+	// regular supercollider file.
+/*  save {
     |filename, commands|
     var f;
 
@@ -168,4 +167,5 @@ FluidCommands {
     );
     ^"FluidSynth Commands Saved";
   }
+	*/
 }
