@@ -142,7 +142,7 @@ FluidSynth {
           select_cmd = select_cmd ++ format("\nselect % % % %", *values);
         }
       };
-    }
+    };
 
 		pr_send(select_cmd);
 	}
