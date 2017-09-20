@@ -146,26 +146,4 @@ FluidSynth {
 
 		pr_send(select_cmd);
 	}
-
-	// Not sure this is the right way to do this. This is now a fluid interface
-	// so trivial to write readable code that does all the setup as part of a
-	// regular supercollider file.
-/*  save {
-    |filename, commands|
-    var f;
-
-    if (
-      filename.isNil.not and: (commands.isNil.not),
-      {
-        f = File(filename.standardizePath, "w");
-        f.write(commands ++ "\n");
-        f.close;
-      },
-      {
-        Error("TO_DO");
-      }
-    );
-    ^"FluidSynth Commands Saved";
-  }
-	*/
 }
