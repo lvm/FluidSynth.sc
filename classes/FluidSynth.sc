@@ -1,7 +1,7 @@
 /*
         FluidSynth class
 
-        (c) 2017 by Mauro <mauro@sdf.org>
+        (c) 2017 by Mauro <mauro@sdf.org>, Cian O'Connor <cian.oconnor@gmail.com>
         http://cyberpunk.com.ar/
 
         A very basic fluidsynth "front-end".
@@ -19,7 +19,6 @@ FluidSynth {
   var audio_server, channels, commands_file;
   var fluidsynth_args;
   var fluidsynth_pipe;
-  //var fluid_output; // Don't think this does anything.
 
   *initClass{
     fluidsynth_bin = "which fluidsynth".unixCmdGetStdOut.replace(Char.nl, "").asString;
@@ -36,7 +35,8 @@ FluidSynth {
     ^fluidsynth;
   }
 
-  init {|audio_server=\jack, channels=16, commands_file=""|
+  init {
+    |audio_server=\jack, channels=16, commands_file=""|
     var audioServer, chan, cmds;
 
     // also, if audioServer is jack autoconnect.
@@ -59,21 +59,11 @@ FluidSynth {
 
     fluidsynth_args = " -sl" ++ audioServer ++ chan ++ " " ++ cmds;
     fluidsynth_pipe = Pipe.new("% %".format(fluidsynth_bin, fluidsynth_args), "w");
-/*    fluid_output = Routine { // Fairly sure this isn't doing anything.
-      var line =     fluidsynth_pipe.getLine;
-      while(
-        { line.notNil },
-        {
-          line.postln;
-            line =     fluidsynth_pipe.getLine;
-        }
-      );
-      fluidsynth_pipe.close;
-    };*/
     "FluidSynth is running!".postln;
   }
 
-  pr_send {|message|
+  pr_send {
+    |message|
     fluidsynth_pipe.write("%\n".format(message));
     fluidsynth_pipe.flush;
   }
@@ -92,21 +82,21 @@ FluidSynth {
   setGain {
     |gain|
 
-		pr_send(format("\ngain %", gain.asFloat.clip(0.01, 4.99)));
+    pr_send(format("\ngain %", gain.asFloat.clip(0.01, 4.99)));
   }
 
   listChannels {
-		pr_send("\nchannels");
+    pr_send("\nchannels");
   }
 
   listSoundfonts {
-		pr_send("\nfonts");
+    pr_send("\nfonts");
   }
 
   listInstruments {
     |soundfont|
 
-		pr_send(format("\ninst %", soundfont));
+    pr_send(format("\ninst %", soundfont));
   }
 
   loadSoundfont {
@@ -116,7 +106,7 @@ FluidSynth {
       Error("TO_DO").throw;
     };
 
-		pr_send(format("\nload %", soundfont));
+    pr_send(format("\nload %", soundfont));
   }
 
   unloadSoundfont {
@@ -126,7 +116,7 @@ FluidSynth {
       Error("TO_DO").throw;
     };
 
-		pr_send(format("\nunload %", soundfont));
+    pr_send(format("\nunload %", soundfont));
   }
 
   selectInstruments {
@@ -144,6 +134,6 @@ FluidSynth {
       };
     };
 
-		pr_send(select_cmd);
-	}
+    pr_send(select_cmd);
+  }
 }

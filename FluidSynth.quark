@@ -1,0 +1,7 @@
+(
+\name: "FluidSynth",
+\summary: "A SuperCollider interface to FluidSynth.",
+\author: "Mauro Lizaur, Cian O'Connor",
+\version: 0.1,
+\organization: "buenos aires live code",
+)

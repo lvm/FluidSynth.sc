@@ -1,0 +1,32 @@
+class:: FluidSynth
+summary:: A SuperCollider interface to FluidSynth.
+categories:: External Control>MIDI
+
+description::
+
+Creates a connection with the `fluidsynth` binary installed on the system.
+
+Examples::
+
+code::
+(
+FluidSynth.init;
+// or
+// FluidSynth.init(audio_server: "jack", channels: 32, commands_file: "~/sf_commands");
+
+FluidSynth.setGain(1);
+FluidSynth.loadSoundfont("~/filename.sf2");
+FluidSynth.listSoundfonts;
+FluidSynth.listChannels;
+FluidSynth.listInstruments(1);
+
+FluidSynth.selectInstruments([
+  (\chan: 2, \sfont: 1, \bank: 2, \prog: 4),
+  (\chan: 9, \sfont: 1, \bank: 128, \prog: 2),
+  (\chan: 10, \sfont: 1, \bank: 128, \prog: 1),
+]);
+
+FluidSynth.unloadSoundfont(1);
+FluidSynth.stop;
+)
+::
