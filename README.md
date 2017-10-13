@@ -33,7 +33,7 @@ Not quite a `fluidsynth` implementation but some sort of _front-end_.
 
 ## Authors
 
-(c) 2017 by Mauro <mauro@sdf.org>, Cian O'Connor <cian.oconnor@gmail.com>
+(c) 2017 by Mauro Lizaur, Cian O'Connor
 
 ## License
 
