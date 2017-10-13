@@ -10,23 +10,23 @@ Examples::
 
 code::
 (
-FluidSynth.init;
+~fluid = FluidSynth();
 // or
-// FluidSynth.init(audio_server: "jack", channels: 32, commands_file: "~/sf_commands");
+// ~fluid = FluidSynth(audio_server, num_channels);
 
-FluidSynth.setGain(1);
-FluidSynth.loadSoundfont("~/filename.sf2");
-FluidSynth.listSoundfonts;
-FluidSynth.listChannels;
-FluidSynth.listInstruments(1);
 
-FluidSynth.selectInstruments([
+~fluid.setGain(1);
+~fluid.loadSoundfont("~/filename.sf2");
+~fluid.listSoundfonts;
+~fluid.listInstruments(1);
+~fluid.selectInstruments([
   (\chan: 2, \sfont: 1, \bank: 2, \prog: 4),
   (\chan: 9, \sfont: 1, \bank: 128, \prog: 2),
   (\chan: 10, \sfont: 1, \bank: 128, \prog: 1),
 ]);
+~fluid.listChannels;
 
-FluidSynth.unloadSoundfont(1);
-FluidSynth.stop;
+~fluid.unloadSoundfont(1);
+~fluid.stop;
 )
 ::
