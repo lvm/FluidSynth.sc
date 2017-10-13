@@ -2,6 +2,12 @@
 
 Not quite a `fluidsynth` implementation but some sort of _front-end_.  
 
+## Installation
+
+```
+Quarks.install("https://github.com/lvm/FluidSynth.sc");
+```
+
 ## Usage
 
 ```
