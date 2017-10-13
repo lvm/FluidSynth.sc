@@ -26,38 +26,39 @@ FluidSynth {
   }
 
   *new {
-    |audio_server channels commands_file|
+    |audio_server channels|
     // singleton pattern
     if(fluidsynth.isNil){
       fluidsynth = super.new;
-      fluidsynth.init(audio_server, channels, commands_file);
+      fluidsynth.init(audio_server, channels);
     }
     ^fluidsynth;
   }
 
   init {
-    |audio_server=\jack, channels=16, commands_file=""|
+    |audio_server=\jack, channels=16|
     var audioServer, chan, cmds;
 
+    audioServer = if (
+      audio_server.isNil.not and:
+      (valid_audio_servers.atIdentityHash(audio_server) == 0),
+      { audio_server },
+      { "jack" });
     // also, if audioServer is jack autoconnect.
-    audioServer = if (audio_server==\jack){
-      " -j -a " ++ audio_server;
-    }{
-      " -a " ++ audio_server;
-    };
+    audioServer = if (
+      audioServer == "jack",
+      { format(" -j -a %", audioServer) },
+      { format(" -a %", audioServer) });
 
-    chan = if (channels >=16 && channels <= 256){
-      " -K " ++ channels
-    }{
-      error("channels should be an integer between 16 and 256");
-    };
+    chan = if (
+      channels.isNil.not and: (channels.isKindOf(Integer)),
+      { format(" -K %", channels.asInt.clip(16, 256)) },
+      { " -K 16" });
 
-    cmds = "";
-    if (File.exists(commands_file.standardizePath)){
-        " -f " ++ commands_file.standardizePath
-    };
+    fluidsynth_args = " -sl" ++ audioServer ++ chan;
 
-    fluidsynth_args = " -sl" ++ audioServer ++ chan ++ " " ++ cmds;
+    "% %".format(fluidsynth_bin, fluidsynth_args).postln;
+
     fluidsynth_pipe = Pipe.new("% %".format(fluidsynth_bin, fluidsynth_args), "w");
     "FluidSynth is running!".postln;
   }
@@ -79,44 +80,39 @@ FluidSynth {
     fluidsynth = nil;
   }
 
+
+  /*
+  FluidSynth Commands
+  */
+
   setGain {
     |gain|
-
-    pr_send(format("\ngain %", gain.asFloat.clip(0.01, 4.99)));
+    this.pr_send(format("\ngain %", gain.asFloat.clip(0.01, 4.99)));
   }
 
   listChannels {
-    pr_send("\nchannels");
+    this.pr_send("\nchannels");
   }
 
   listSoundfonts {
-    pr_send("\nfonts");
+    this.pr_send("\nfonts");
   }
 
   listInstruments {
     |soundfont|
-
-    pr_send(format("\ninst %", soundfont));
+    this.pr_send(format("\ninst %", soundfont));
   }
 
   loadSoundfont {
     |soundfont|
-
-    if (soundfont.isNil) {
-      Error("TO_DO").throw;
-    };
-
-    pr_send(format("\nload %", soundfont));
+    if (soundfont.isNil) { Error("TO_DO").throw; };
+    this.pr_send(format("\nload %", soundfont));
   }
 
   unloadSoundfont {
     |soundfont|
-
-    if (soundfont.isNil) {
-      Error("TO_DO").throw;
-    };
-
-    pr_send(format("\nunload %", soundfont));
+    if (soundfont.isNil) { Error("TO_DO").throw; };
+    this.pr_send(format("\nunload %", soundfont));
   }
 
   selectInstruments {
@@ -134,6 +130,7 @@ FluidSynth {
       };
     };
 
-    pr_send(select_cmd);
+    this.pr_send(select_cmd);
   }
+
 }
