@@ -37,4 +37,4 @@ Not quite a `fluidsynth` implementation but some sort of _front-end_.
 
 ## License
 
-See [LICENSE]
+See [LICENSE](LICENSE)
