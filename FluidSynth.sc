@@ -90,6 +90,11 @@ FluidSynth {
     this.pr_send(format("\ngain %", gain.asFloat.clip(0.01, 4.99)));
   }
 
+  setProgram {
+    |chan, prog|
+    this.pr_send(format("\nprog % %", chan.clip(0,15), prog.clip(0, 127)));
+  }
+
   listChannels {
     this.pr_send("\nchannels");
   }
