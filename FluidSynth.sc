@@ -26,18 +26,18 @@ FluidSynth {
   }
 
   *new {
-    |audio_server channels|
+    |audio_server midi_channels audio_channels|
     // singleton pattern
     if(fluidsynth.isNil){
       fluidsynth = super.new;
-      fluidsynth.init(audio_server, channels);
+      fluidsynth.init(audio_server, midi_channels, audio_channels);
     }
     ^fluidsynth;
   }
 
   init {
-    |audio_server=\jack, channels=16|
-    var audioServer, chan, cmds;
+    |audio_server=\jack, midi_channels=16 audio_channels=2|
+    var audioServer, mdchan, auchan;
 
     audioServer = if (
       audio_server.isNil.not and:
@@ -50,15 +50,17 @@ FluidSynth {
       { format(" -j -a %", audioServer) },
       { format(" -a %", audioServer) });
 
-    chan = if (
-      channels.isNil.not and: (channels.isKindOf(Integer)),
-      { format(" -K %", channels.asInt.clip(16, 256)) },
+    mdchan = if (
+      midi_channels.isNil.not and: (midi_channels.isKindOf(Integer)),
+      { format(" -K %", midi_channels.asInt.clip(16, 256)) },
       { " -K 16" });
 
-    fluidsynth_args = " -sl" ++ audioServer ++ chan;
+    auchan = if (
+      audio_channels.isNil.not and: (audio_channels.isKindOf(Integer)),
+      { format(" -L %", audio_channels.asInt.clip(2, 16)) },
+      { " -L 16" });
 
-    "% %".format(fluidsynth_bin, fluidsynth_args).postln;
-
+    fluidsynth_args = " -sl" ++ audioServer ++ mdchan ++ auchan;
     fluidsynth_pipe = Pipe.new("% %".format(fluidsynth_bin, fluidsynth_args), "w");
     "FluidSynth is running!".postln;
   }
