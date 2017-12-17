@@ -36,7 +36,7 @@ FluidSynth {
   }
 
   init {
-    |audio_server=\jack, midi_channels=16 audio_channels=2|
+    |audio_server=\jack, midi_channels=16 audio_channels=1|
     var audioServer, mdchan, auchan;
 
     audioServer = if (
@@ -57,8 +57,8 @@ FluidSynth {
 
     auchan = if (
       audio_channels.isNil.not and: (audio_channels.isKindOf(Integer)),
-      { format(" -L %", audio_channels.asInt.clip(2, 16)) },
-      { " -L 16" });
+      { format(" -L %", audio_channels.asInt.clip(1, 16)) },
+      { " -L 1" });
 
     fluidsynth_args = " -sl" ++ audioServer ++ mdchan ++ auchan;
     fluidsynth_pipe = Pipe.new("% %".format(fluidsynth_bin, fluidsynth_args), "w");
