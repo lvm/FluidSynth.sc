@@ -37,14 +37,19 @@ FluidSynth {
 
   init {
     |audio_server=\jack, midi_channels=16 audio_channels=1|
-    var audioServer, mdchan, auchan;
+    var audioServer, jackMulti, mdchan, auchan;
 
     audioServer = if (
       audio_server.isNil.not and:
       (valid_audio_servers.atIdentityHash(audio_server) == 0),
       { audio_server },
       { "jack" });
-    // also, if audioServer is jack autoconnect.
+    // also, if audioServer is jack enable multi chan.
+    jackMulti = if (
+      audioServer == "jack",
+      { " -o audio.jack.multi=true" },
+      { "" });
+    // and autoconnect.
     audioServer = if (
       audioServer == "jack",
       { format(" -j -a %", audioServer) },
@@ -60,7 +65,7 @@ FluidSynth {
       { format(" -L %", audio_channels.asInt.clip(1, 16)) },
       { " -L 1" });
 
-    fluidsynth_args = " -sl" ++ audioServer ++ mdchan ++ auchan;
+    fluidsynth_args = " -sl" ++ audioServer ++ jackMulti ++ mdchan ++ auchan;
     fluidsynth_pipe = Pipe.new("% %".format(fluidsynth_bin, fluidsynth_args), "w");
     "FluidSynth is running!".postln;
   }
