@@ -2,6 +2,6 @@
 \name: "FluidSynth",
 \summary: "A SuperCollider interface to FluidSynth.",
 \author: "Mauro Lizaur, Cian O'Connor",
-\version: 0.1,
+\version: 0.2,
 \organization: "buenos aires live code",
 )
