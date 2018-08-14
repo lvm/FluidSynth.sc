@@ -102,6 +102,27 @@ FluidSynth {
     this.pr_send(format("\nprog % %", chan.clip(0,15), prog.clip(0, 127)));
   }
 
+  reverb {
+    |reverb|
+    this.pr_send(format("reverb %", reverb));
+  }
+  rev_room {
+    |room|
+    this.pr_send(format("rev_setroomsize %", room));
+  }
+  rev_damp {
+    |damp|
+    this.pr_send(format("rev_setdamp %", damp));
+  }
+  rev_width {
+    |width|
+    this.pr_send(format("rev_width %", width));
+  }
+  rev_level {
+    |level|
+    this.pr_send(format("rev_setlevel %", level));
+  }
+
   listChannels {
     this.pr_send("\nchannels");
   }
