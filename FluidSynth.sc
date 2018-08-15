@@ -26,17 +26,17 @@ FluidSynth {
   }
 
   *new {
-    |audio_server midi_channels audio_channels|
+    |audio_server midi_channels audio_channels extra_args|
     // singleton pattern
     if(fluidsynth.isNil){
       fluidsynth = super.new;
-      fluidsynth.init(audio_server, midi_channels, audio_channels);
+      fluidsynth.init(audio_server, midi_channels, audio_channels, extra_args);
     }
     ^fluidsynth;
   }
 
   init {
-    |audio_server=\jack, midi_channels=16 audio_channels=1|
+    |audio_server=\jack, midi_channels=16 audio_channels=1, extra_args=""|
     var audioServer, jackMulti, mdchan, auchan;
 
     audioServer = if (
@@ -65,12 +65,12 @@ FluidSynth {
       { format(" -L %", audio_channels.asInt.clip(1, 16)) },
       { " -L 1" });
 
-    fluidsynth_args = " -sl" ++ audioServer ++ jackMulti ++ mdchan ++ auchan;
+    fluidsynth_args = " -sl" ++ audioServer ++ jackMulti ++ mdchan ++ auchan + extra_args;
     fluidsynth_pipe = Pipe.new("% %".format(fluidsynth_bin, fluidsynth_args), "w");
     "FluidSynth is running!".postln;
   }
 
-  pr_send {
+  prSend {
     |message|
     fluidsynth_pipe.write("%\n".format(message));
     fluidsynth_pipe.flush;
@@ -78,12 +78,12 @@ FluidSynth {
 
   stop {
     fluidsynth_pipe.close;
-    FluidSynth.pr_close;
+    FluidSynth.prClose;
     "FluidSynth is stopped!".postln;
   }
 
   /* Make sure that fluidsynth is set to nil once it's stopped so it can be reopened later */
-  *pr_close{
+  *prClose{
     fluidsynth = nil;
   }
 
@@ -92,60 +92,93 @@ FluidSynth {
   FluidSynth Commands
   */
 
+  // Reverb settings
+  reverb {
+    |reverb|
+    // Turn the reverb on or off
+    this.prSend(format("reverb %", reverb));
+  }
+  rev_preset {
+    |preset|
+    /*
+    Load preset num into the reverb unit
+
+    num:0 roomsize:0.2 damp:0.0 width:0.5 level:0.9
+    num:1 roomsize:0.4 damp:0.2 width:0.5 level:0.8
+    num:2 roomsize:0.6 damp:0.4 width:0.5 level:0.7
+    num:3 roomsize:0.8 damp:0.7 width:0.5 level:0.6
+    num:4 roomsize:0.8 damp:1.0 width:0.5 level:0.5
+    */
+    this.prSend(format("rev_preset %", preset));
+  }
+  rev_room {
+    |room=0.2|
+    // Change reverb room size (i.e the reverb time) in the range [0 to 1.0] (default: 0.2)
+    this.prSend(format("rev_setroomsize %", room));
+  }
+  rev_damp {
+    |damp=0.0|
+    /*
+    Change reverb damping in the range [0.0 to 1.0] (default: 0.0)
+
+    When 0.0, no damping.
+    Between 0.0 and 1.0, higher frequencies have less reverb time than lower frequencies.
+    When 1.0, all frequencies are damped even if room size is at maximum value.
+    */
+    this.prSend(format("rev_setdamp %", damp));
+  }
+  rev_width {
+    |width=0.5|
+    /*
+    Change reverb width in the range [0.0 to 100.0] (default: 0.5)
+    num value defines how much the right channel output is separated of the left channel output.
+
+    When 0.0, there is no separation (i.e the output is mono).
+    When 100.0, the stereo effect is maximum.
+    */
+    this.prSend(format("rev_width %", width));
+  }
+  rev_level {
+    |level=0.9|
+    // Change reverb output level in the range [0.0 to 1.0] (default: 0.9)
+    this.prSend(format("rev_setlevel %", level));
+  }
+
+  // Channels and Soundfont files
+
   setGain {
     |gain|
-    this.pr_send(format("\ngain %", gain.asFloat.clip(0.01, 4.99)));
+    this.prSend(format("\ngain %", gain.asFloat.clip(0.01, 4.99)));
   }
 
   setProgram {
     |chan, prog|
-    this.pr_send(format("\nprog % %", chan.clip(0,15), prog.clip(0, 127)));
-  }
-
-  reverb {
-    |reverb|
-    this.pr_send(format("reverb %", reverb));
-  }
-  rev_room {
-    |room|
-    this.pr_send(format("rev_setroomsize %", room));
-  }
-  rev_damp {
-    |damp|
-    this.pr_send(format("rev_setdamp %", damp));
-  }
-  rev_width {
-    |width|
-    this.pr_send(format("rev_width %", width));
-  }
-  rev_level {
-    |level|
-    this.pr_send(format("rev_setlevel %", level));
+    this.prSend(format("\nprog % %", chan.clip(0,15), prog.clip(0, 127)));
   }
 
   listChannels {
-    this.pr_send("\nchannels");
+    this.prSend("\nchannels");
   }
 
   listSoundfonts {
-    this.pr_send("\nfonts");
+    this.prSend("\nfonts");
   }
 
   listInstruments {
     |soundfont|
-    this.pr_send(format("\ninst %", soundfont));
+    this.prSend(format("\ninst %", soundfont));
   }
 
   loadSoundfont {
     |soundfont|
     if (soundfont.isNil) { Error("TO_DO").throw; };
-    this.pr_send(format("\nload %", soundfont));
+    this.prSend(format("\nload %", soundfont));
   }
 
   unloadSoundfont {
     |soundfont|
     if (soundfont.isNil) { Error("TO_DO").throw; };
-    this.pr_send(format("\nunload %", soundfont));
+    this.prSend(format("\nunload %", soundfont));
   }
 
   selectInstruments {
@@ -163,7 +196,7 @@ FluidSynth {
       };
     };
 
-    this.pr_send(select_cmd);
+    this.prSend(select_cmd);
   }
 
 }
